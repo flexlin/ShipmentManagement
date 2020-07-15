@@ -5,7 +5,7 @@ import com.flex.shipment.enums.Status;
 import java.io.Serializable;
 
 /**
- * @Description:
+ * @Description: order of trade
  * @Author: flex
  * @Date: 11:54 2020/7/14
  */

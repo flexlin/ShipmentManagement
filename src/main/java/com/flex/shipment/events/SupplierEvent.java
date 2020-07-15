@@ -5,7 +5,7 @@ import com.flex.shipment.manage.Supplier;
 import com.flex.shipment.pojo.Trade;
 
 /**
- * @Description:
+ * @Description: Event
  * @Author: flex
  * @Date: 17:17 2020/7/14
  */

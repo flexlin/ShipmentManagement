@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Description:
+ * @Description: this class is the task for operator
  * @Author: flex
  * @Date: 12:47 2020/7/14
  */

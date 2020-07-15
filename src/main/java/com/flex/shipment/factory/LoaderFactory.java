@@ -4,7 +4,7 @@ import com.flex.shipment.action.Loader;
 import com.flex.shipment.pojo.Shipment;
 
 /**
- * @Description:
+ * @Description: LoaderFactory class
  * @Author: flex
  * @Date: 14:11 2020/7/14
  */

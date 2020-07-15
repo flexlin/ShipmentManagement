@@ -28,8 +28,6 @@ public class ManagerBackend {
     private SupplierManager supplierManager = new SupplierManager(goodsFactory,loaderFactory,supplierListener);
     private TaskManager taskManager = new TaskManager(supplierManager.getOperation());
     private Scheduler scheduler = new Scheduler(supplierListener,supplierManager,taskManager);
-//    private ExecutorService threadPool = Executors.newCachedThreadPool();
-
 
     private void init() {
         ExecutorService threadPool = taskManager.getThreadPool();

@@ -8,7 +8,7 @@ import com.flex.shipment.pojo.Trade;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @Description:
+ * @Description: system scheduler
  * @Author: flex
  * @Date: 17:25 2020/7/14
  */

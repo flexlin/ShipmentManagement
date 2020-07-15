@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * @Description:
+ * @Description: client to service communication
  * @Author: flex
  * @Date: 14:03 2020/7/14
  */

@@ -5,7 +5,7 @@ import com.flex.shipment.pojo.Shipment;
 import java.util.List;
 
 /**
- * @Description:
+ * @Description: System base role
  * @Author: flex
  * @Date: 12:07 2020/7/14
  */

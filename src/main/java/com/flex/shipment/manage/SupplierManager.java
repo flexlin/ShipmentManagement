@@ -5,10 +5,9 @@ import com.flex.shipment.events.SupplierEvent;
 import com.flex.shipment.events.SupplierListener;
 import com.flex.shipment.factory.GoodsFactory;
 import com.flex.shipment.factory.LoaderFactory;
-import com.flex.shipment.factory.ShipmentFactory;
 import com.flex.shipment.pojo.Goods;
 import com.flex.shipment.pojo.Trade;
-import com.flex.shipment.pojo.Tuple;
+import com.flex.shipment.util.Tuple;
 import com.flex.shipment.rule.BasePlan;
 
 import java.util.HashMap;
@@ -17,7 +16,7 @@ import java.util.Map;
 import static jdk.nashorn.internal.objects.NativeMath.random;
 
 /**
- * @Description: This class management Supplier
+ * @Description: This class is management Supplier
  * @Author: flex
  * @Date: 21:03 2020/7/14
  */

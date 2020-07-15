@@ -6,7 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 
 /**
- * @Description:
+ * @Description: core operate
  * @Author: flex
  * @Date: 12:49 2020/7/14
  */

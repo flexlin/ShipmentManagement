@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @Description: management Task
+ * @Description: management for task
  * @Author: flex
  * @Date: 19:52 2020/7/14
  */

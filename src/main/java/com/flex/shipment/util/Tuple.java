@@ -1,7 +1,7 @@
-package com.flex.shipment.pojo;
+package com.flex.shipment.util;
 
 /**
- * @Description:
+ * @Description: data struct
  * @Author: flex
  * @Date: 21:31 2020/7/14
  */

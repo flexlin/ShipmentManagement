@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * @Description:
+ * @Description: Operator
  * @Author: flex
  * @Date: 11:43 2020/7/14
  */
