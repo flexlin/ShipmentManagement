@@ -21,7 +21,7 @@ import static jdk.nashorn.internal.objects.NativeMath.random;
  * @Date: 21:03 2020/7/14
  */
 public class SupplierManager {
-    // key is trade name
+    // key is tradeId
     private Map<String, Tuple<Supplier, Trade>> map = new HashMap<String, Tuple<Supplier, Trade>>();
     private SupplierListener supplierListener;
     private GoodsFactory goodsFactory;
@@ -70,6 +70,10 @@ public class SupplierManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void removeTrade(String tradeId){
+        map.remove(tradeId);
     }
 
 

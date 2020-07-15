@@ -63,6 +63,11 @@ public class TaskManager {
                             executeTask(poll);
                             while (!poll.getFinished()) {
                                 try {
+                                    for(String s:map.keySet()){
+                                        if (map.get(s).getFinished()){
+                                            map.remove(s);
+                                        }
+                                    }
                                     Thread.sleep(100);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
@@ -87,6 +92,9 @@ public class TaskManager {
         task.runTask(threadPool);
     }
 
+    public void removeTrade(String tradeId){
+        tradeMapTask.remove(tradeId);
+    }
 
 
 }

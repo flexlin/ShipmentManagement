@@ -60,8 +60,10 @@ public class Scheduler {
                                     taskManager.createTask(event); break;
                                 case CHANGE:
                                     taskManager.createTask(event); break;
-                                case CONFIRM:
-                                    taskManager.createTask(event); break;
+                                case CONFIRM: {
+                                    supplierManager.removeTrade(event.getTrade().getTradeId());
+                                    taskManager.removeTrade(event.getTrade().getTradeId());
+                                }; break;
                             }
                         }
                     }catch (Exception e){
