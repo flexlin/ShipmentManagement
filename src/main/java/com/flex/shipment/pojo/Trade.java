@@ -12,12 +12,12 @@ import java.io.Serializable;
 public class Trade<T> implements Serializable {
 
     private Shipment<T> total;
-    private String name;
+    private String tradeId;
     private Status status;
     private Class<T> type;
 
     public Trade(String name,int total,Class<T> t){
-        this.name = name;
+        this.tradeId = name;
         this.type = t;
         this.total = new Shipment<T>(total);
         this.status = Status.START;
@@ -36,12 +36,12 @@ public class Trade<T> implements Serializable {
         this.status = Status.CHANGE;
     }
 
-    public String getName() {
-        return name;
+    public String getTradeId() {
+        return tradeId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
     }
 
     public Status getStatus() {

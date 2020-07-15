@@ -53,5 +53,13 @@ public class SupplierTest {
         System.out.println(list.size());
     }
 
+    @Test
+    public void testNon(){
+        Supplier<Goods> supplier = newInstance();
+        ArrayList<Shipment<Goods>> shipments = new ArrayList<Shipment<Goods>>();
+        List<Shipment<Goods>> list = supplier.getNonEmptyShipments(supplier.getTrade().getTotal(), shipments);
+        System.out.println(list.size());
+    }
+
 
 }

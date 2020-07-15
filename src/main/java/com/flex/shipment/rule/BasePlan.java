@@ -27,6 +27,14 @@ public class BasePlan implements Plan {
         this.merge = merge;
     }
 
+    public int getSplitsSum(){
+        int n = 0;
+        for (int i=0;i<split.length;i++){
+            n += split[i];
+        }
+        return n;
+    }
+
     public Integer[] splits() {
         return split;
     }

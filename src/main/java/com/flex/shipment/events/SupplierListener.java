@@ -11,6 +11,7 @@ public class SupplierListener {
     private static LinkedBlockingQueue<SupplierEvent> suppliers = new LinkedBlockingQueue<SupplierEvent>();
 
     public void register(SupplierEvent event){
+        System.out.println("SupplierListener TradeId:"+event.getTrade().getTradeId()+","+event.getStatus());
         suppliers.add(event);
     }
 

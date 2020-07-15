@@ -26,6 +26,7 @@ public class Supplier<T> implements Baser<T>{
     private Status status;
     private SupplierListener supplierListener;
     private GoodsFactory goodsFactory;
+    private Integer loadSum;
 
     public Supplier(String name, Trade<T> trade, GoodsFactory goodsFactory, Plan plan, SupplierListener supplierListener){
         this.name = name;
@@ -33,6 +34,15 @@ public class Supplier<T> implements Baser<T>{
         this.plan = plan;
         this.goodsFactory = goodsFactory;
         this.supplierListener = supplierListener;
+        this.loadSum = trade.getTotal().getNum();
+    }
+
+    public Integer getLoadSum() {
+        return loadSum;
+    }
+
+    public void setLoadSum(Integer loadSum) {
+        this.loadSum = loadSum;
     }
 
     public GoodsFactory getGoodsFactory() {
@@ -80,13 +90,14 @@ public class Supplier<T> implements Baser<T>{
         if(shipment.getChild() == null) {
             Integer[] splits = plan.splits();
             List<Shipment<T>> tShipment = new ArrayList<Shipment<T>>(splits.length);
-            for (Integer i : splits) {
-                Shipment<T> tShipment1 = new Shipment<T>(splits[i]);
+            for (int i=0;i<splits.length;i++) {
+                Shipment<T> tShipment1 = new Shipment<T>(splits[i] * shipment.getNum() / this.plan.getSplitsSum());
                 ArrayList<Shipment<T>> arrayList = new ArrayList<Shipment<T>>();
                 arrayList.add(shipment);
                 tShipment1.setDeps(arrayList);
                 tShipment.add(tShipment1);
             }
+            shipment.setChild(tShipment);
             return tShipment;
         }else {
             return shipment.getChild();
@@ -96,8 +107,8 @@ public class Supplier<T> implements Baser<T>{
     public Shipment<T> merge() {
         int n = 0;
         List<Shipment<T>> split = this.split();
-        if(split.get(0).getChild()==null) {
-            Integer[] merge = this.plan.merge();
+        Integer[] merge = this.plan.merge();
+        if(split.get(merge[0]).getChild()==null) {
             ArrayList<Shipment<T>> shipments = new ArrayList<Shipment<T>>();
             for (Integer i : merge) {
                 Shipment<T> tShipment = split.get(i);
@@ -105,16 +116,16 @@ public class Supplier<T> implements Baser<T>{
                 n += tShipment.getNum();
             }
             Shipment<T> tShipment = new Shipment<T>(n);
+            tShipment.setDeps(shipments);
             for (Integer i : merge) {
                 Shipment<T> tShipment1 = split.get(i);
                 ArrayList<Shipment<T>> shipments1 = new ArrayList<Shipment<T>>();
                 shipments1.add(tShipment);
                 tShipment1.setChild(shipments1);
             }
-            tShipment.setDeps(shipments);
             return tShipment;
         }else {
-            return split.get(0).getChild().get(0);
+            return split.get(merge[0]).getChild().get(0);
         }
     }
 
@@ -132,7 +143,7 @@ public class Supplier<T> implements Baser<T>{
      * @param shipments
      * @return
      */
-    public List<Shipment<T>> getLeafShipments(Shipment<T> shipment,List<Shipment<T>> shipments){
+    public List<Shipment<T>> getNonEmptyShipments(Shipment<T> shipment,List<Shipment<T>> shipments){
         ArrayBlockingQueue<T> addr = shipment.getAddr();
         if (!addr.isEmpty()){
             shipments.add(shipment);
@@ -140,8 +151,26 @@ public class Supplier<T> implements Baser<T>{
             List<Shipment<T>> child = shipment.getChild();
             if (child != null) {
                 for (Shipment<T> s : child) {
-                    getLeafShipments(s, shipments);
+                    getNonEmptyShipments(s, shipments);
                 }
+            }
+        }
+        return shipments;
+    }
+
+    /**
+     * obtain leaf Shipment
+     * @param shipment
+     * @param shipments
+     * @return
+     */
+    public List<Shipment<T>> getLeafShipments(Shipment<T> shipment,List<Shipment<T>> shipments){
+        List<Shipment<T>> child = shipment.getChild();
+        if (child == null) {
+            shipments.add(shipment);
+        }else {
+            for (Shipment<T> s : child) {
+                getLeafShipments(s, shipments);
             }
         }
         return shipments;

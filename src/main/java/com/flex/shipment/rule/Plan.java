@@ -19,4 +19,6 @@ public interface Plan {
 
     boolean isGrow();
 
+    int getSplitsSum();
+
 }

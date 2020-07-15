@@ -4,6 +4,7 @@ import com.flex.shipment.enums.Status;
 import com.flex.shipment.events.SupplierEvent;
 import com.flex.shipment.events.SupplierListener;
 import com.flex.shipment.factory.GoodsFactory;
+import com.flex.shipment.factory.LoaderFactory;
 import com.flex.shipment.factory.ShipmentFactory;
 import com.flex.shipment.pojo.Goods;
 import com.flex.shipment.pojo.Trade;
@@ -25,10 +26,20 @@ public class SupplierManager {
     private Map<String, Tuple<Supplier, Trade>> map = new HashMap<String, Tuple<Supplier, Trade>>();
     private SupplierListener supplierListener;
     private GoodsFactory goodsFactory;
+    private OperationScheduler operation;
 
-    public SupplierManager(GoodsFactory goodsFactory,SupplierListener supplierListener){
+    public SupplierManager(GoodsFactory goodsFactory, LoaderFactory loaderFactory, SupplierListener supplierListener){
         this.goodsFactory = goodsFactory;
         this.supplierListener = supplierListener;
+        this.operation = new OperationScheduler(loaderFactory,supplierListener);
+    }
+
+    public OperationScheduler getOperation() {
+        return operation;
+    }
+
+    public void setOperation(OperationScheduler operation) {
+        this.operation = operation;
     }
 
     public Tuple<Supplier, Trade> getSupplier(String name){
@@ -37,15 +48,16 @@ public class SupplierManager {
     }
 
     public Supplier createSupplier(Trade trade){
-        if(map.get(trade.getName()) == null) {
+        if(map.get(trade.getTradeId()) == null) {
             BasePlan basePlan = new BasePlan();
             String name = "supplier" + System.currentTimeMillis() + random(1000);
+            System.out.println("createSupplier:" + name);
             Supplier<Goods> supplier = new Supplier<Goods>(name, trade, goodsFactory, basePlan, supplierListener);
             supplier.setStatus(Status.START);
-            this.map.put(trade.getName(), new Tuple<Supplier, Trade>(supplier, trade));
+            this.map.put(trade.getTradeId(), new Tuple<Supplier, Trade>(supplier, trade));
             return supplier;
         }else {
-            Tuple<Supplier, Trade> tuple = map.get(trade.getName());
+            Tuple<Supplier, Trade> tuple = map.get(trade.getTradeId());
             SupplierEvent<Goods> event = new SupplierEvent<Goods>(trade.getStatus(), tuple.getA(), trade);
             supplierListener.register(event);
         }
