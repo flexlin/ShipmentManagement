@@ -21,7 +21,7 @@ public class TaskManager {
     private Map<String, List<Task>> tradeMapTask = new HashMap<String, List<Task>>();
     private Operator operator;
     private LinkedBlockingQueue<Task> taskPool = new  LinkedBlockingQueue<Task>();
-    private ExecutorService threadPool = Executors.newFixedThreadPool(50);
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public ExecutorService getThreadPool() {
         return threadPool;
