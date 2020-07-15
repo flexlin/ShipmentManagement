@@ -35,4 +35,21 @@ public class SubmitTradeTest {
         submitTrade.submit(trade,"localhost",10230);
     }
 
+    @Test
+    public void testN() throws Exception {
+        int n = 0;
+        SubmitTrade submitTrade = new SubmitTrade();
+        while (n<10000){
+            Trade<Goods> trade = new Trade<Goods>("myTrade-"+n, 100, Goods.class);
+            try {
+                submitTrade.submit(trade,"localhost",10230);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            n++;
+        }
+    }
+
+
+
 }

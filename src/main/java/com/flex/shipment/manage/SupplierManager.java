@@ -47,18 +47,27 @@ public class SupplierManager {
     }
 
     public Supplier createSupplier(Trade trade){
-        if(map.get(trade.getTradeId()) == null) {
-            BasePlan basePlan = new BasePlan();
-            String name = "supplier" + System.currentTimeMillis() + random(1000);
-            System.out.println("createSupplier:" + name);
-            Supplier<Goods> supplier = new Supplier<Goods>(name, trade, goodsFactory, basePlan, supplierListener);
-            supplier.setStatus(Status.START);
-            this.map.put(trade.getTradeId(), new Tuple<Supplier, Trade>(supplier, trade));
-            return supplier;
-        }else {
-            Tuple<Supplier, Trade> tuple = map.get(trade.getTradeId());
-            SupplierEvent<Goods> event = new SupplierEvent<Goods>(trade.getStatus(), tuple.getA(), trade);
-            supplierListener.register(event);
+        try {
+            if (map.get(trade.getTradeId()) == null) {
+                BasePlan basePlan = new BasePlan();
+                String name = "supplier" + System.currentTimeMillis() + random(1000);
+                System.out.println("createSupplier:" + name);
+                Supplier<Goods> supplier = new Supplier<Goods>(name, trade, goodsFactory, basePlan, supplierListener);
+                supplier.setStatus(Status.START);
+                this.map.put(trade.getTradeId(), new Tuple<Supplier, Trade>(supplier, trade));
+                return supplier;
+            } else {
+                if (trade.getStatus() == Status.START) return null;
+                if (trade.getTotal().getNum() == map.get(trade.getTradeId()).getB().getTotal().getNum()) {
+                    return null;
+                } else {
+                    Tuple<Supplier, Trade> tuple = map.get(trade.getTradeId());
+                    SupplierEvent<Goods> event = new SupplierEvent<Goods>(trade.getStatus(), tuple.getA(), trade);
+                    supplierListener.register(event);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return null;
     }
