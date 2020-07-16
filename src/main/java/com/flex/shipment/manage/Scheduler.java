@@ -3,6 +3,7 @@ package com.flex.shipment.manage;
 import com.flex.shipment.enums.Status;
 import com.flex.shipment.events.SupplierEvent;
 import com.flex.shipment.events.SupplierListener;
+import com.flex.shipment.pojo.Goods;
 import com.flex.shipment.pojo.Trade;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -24,7 +25,14 @@ public class Scheduler {
         this.taskManager = taskManager;
     }
 
-    public void receiver(Trade trade){
+    public void receiver(Object o){
+        if (o == null) return;
+        Trade t = (Trade)o;
+        Class<?> type = t.getType();
+        Trade trade = null;
+        if (Goods.class.equals(type)) {
+            trade = (Trade<Goods>) t;
+        }
         Supplier supplier = supplierManager.createSupplier(trade);
         if (supplier != null) {
             SupplierEvent event = new SupplierEvent(Status.START, supplier, trade);

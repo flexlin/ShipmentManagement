@@ -3,17 +3,14 @@ package com.flex.shipment.manage;
 import com.flex.shipment.events.SupplierListener;
 import com.flex.shipment.factory.GoodsFactory;
 import com.flex.shipment.factory.LoaderFactory;
-import com.flex.shipment.pojo.Goods;
-import com.flex.shipment.pojo.Trade;
+import com.flex.shipment.nio.ServerSelectorProtocol;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @Description: service enter to start
@@ -42,32 +39,42 @@ public class ManagerBackend {
             public void run() {
                 try {
                     init();
-                    ServerSocket server = new ServerSocket(10230);
+                    Selector selector = Selector.open();
+                    ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+                    serverSocketChannel.bind(new InetSocketAddress(10230));
+                    serverSocketChannel.configureBlocking(false);
+                    serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+                    ServerSelectorProtocol protocol = new ServerSelectorProtocol();
+                    int i = 0;
                     while (true) {
-                        Socket socket = server.accept();
-                        InputStream inputStream = socket.getInputStream();
-
-                        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                        SelectionKey key = null;
                         try {
-                            Trade<Goods> trade = (Trade<Goods>) objectInputStream.readObject();
-
-                            scheduler.receiver(trade);
-
-                            System.out.println("goodsTrade num: " + trade.getTotal().getNum());
-
-                        } catch (ClassNotFoundException e) {
+                            selector.select(1000);
+                            Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                            while (iterator.hasNext()) {
+                                System.out.println("accept:"+ i++);
+                                key = iterator.next();
+                                iterator.remove();
+                                if (key.isAcceptable()) {
+                                    System.out.println("isAcceptable!");
+                                    protocol.handleAccept(key, "Hello Client,I get the message.", 1024);
+                                }
+                                if (key.isReadable()) {
+                                    System.out.println("handleRead!");
+                                    Object o = protocol.handleRead(key);
+                                    scheduler.receiver(o);
+                                }
+                            }
+                        }catch (Exception e) {
+                            if(key !=null){
+                                key.cancel();
+                                if(key.channel() !=null)
+                                    key.channel().close();
+                            }
                             e.printStackTrace();
                         }
-
-                        OutputStream outputStream = socket.getOutputStream();
-                        outputStream.write("Hello Client,I get the message.".getBytes("UTF-8"));
-
-                        inputStream.close();
-                        outputStream.close();
-                        socket.close();
                     }
-//            server.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
