@@ -9,9 +9,11 @@ import com.flex.shipment.pojo.Goods;
 import com.flex.shipment.pojo.Trade;
 import com.flex.shipment.util.Tuple;
 import com.flex.shipment.rule.BasePlan;
+import org.omg.PortableServer.THREAD_POLICY_ID;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static jdk.nashorn.internal.objects.NativeMath.random;
 
@@ -26,11 +28,16 @@ public class SupplierManager {
     private SupplierListener supplierListener;
     private GoodsFactory goodsFactory;
     private OperationScheduler operation;
+    private LinkedBlockingQueue<Object> objectsPool = new LinkedBlockingQueue<Object>();
 
     public SupplierManager(GoodsFactory goodsFactory, LoaderFactory loaderFactory, SupplierListener supplierListener){
         this.goodsFactory = goodsFactory;
         this.supplierListener = supplierListener;
         this.operation = new OperationScheduler(loaderFactory,supplierListener);
+    }
+
+    public LinkedBlockingQueue<Object> getObjectsPool() {
+        return objectsPool;
     }
 
     public OperationScheduler getOperation() {
@@ -46,6 +53,41 @@ public class SupplierManager {
         return tuple;
     }
 
+    public Thread start(){
+        return new Thread(){
+            @Override
+            public void run() {
+                System.out.println("SupplierManager starting...");
+                while (true){
+                    try {
+                        Object obj = objectsPool.poll();
+                        if (obj != null) {
+                             dealObject(obj);
+                        } else {
+                            Thread.sleep(1000);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+    }
+
+
+
+    private void dealObject(Object o){
+        if (o == null) return;
+        Trade t = (Trade)o;
+        Class<?> type = t.getType();
+        Trade trade = null;
+        if (Goods.class.equals(type)) {
+            trade = (Trade<Goods>) t;
+        }
+        this.createSupplier(trade);
+    }
+
+
     public Supplier createSupplier(Trade trade){
         try {
             if (map.get(trade.getTradeId()) == null) {
@@ -55,6 +97,8 @@ public class SupplierManager {
                 Supplier<Goods> supplier = new Supplier<Goods>(name, trade, goodsFactory, basePlan, supplierListener);
                 supplier.setStatus(Status.START);
                 this.map.put(trade.getTradeId(), new Tuple<Supplier, Trade>(supplier, trade));
+                SupplierEvent event = new SupplierEvent(Status.START, supplier, trade);
+                supplierListener.register(event);
                 return supplier;
             } else {
                 if (trade.getStatus() == Status.START) return null;

@@ -5,12 +5,24 @@ import com.flex.shipment.pojo.Goods;
 import com.flex.shipment.pojo.Trade;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 /**
  * @Description:
  * @Author: flex
  * @Date: 0:38 2020/7/16
  */
 public class SubmitTradeTest {
+
+    public static void main(String[] args)throws Exception {
+        SubmitTrade submitTrade = new SubmitTrade();
+        Trade<Goods> trade = new Trade<Goods>("myTrade", 100, Goods.class);
+        submitTrade.submit(trade,"localhost",10230);
+    }
 
     @Test
     public void testStart() throws Exception {
@@ -37,6 +49,7 @@ public class SubmitTradeTest {
 
     @Test
     public void testN() throws Exception {
+        long start = System.currentTimeMillis();
         int n = 0;
         SubmitTrade submitTrade = new SubmitTrade();
         while (n<10000){
@@ -48,8 +61,29 @@ public class SubmitTradeTest {
             }
             n++;
         }
+        long end = System.currentTimeMillis();
+        System.out.println("time : "+(end - start)/1000 +"s");
     }
 
-
+    @Test
+    public void testNWithThread()throws Exception{
+        long start = System.currentTimeMillis();
+        int n = 0;
+        int num = 100;
+        ArrayList<Thread> threads = new ArrayList<>();
+        while (n<100) {
+            SendThread sendThread = new SendThread(n * num, num, 200);
+            Thread thread = new Thread(sendThread);
+            threads.add(thread);
+            thread.start();
+            n++;
+        }
+        System.out.println("---------------------exec---------------------");
+        for (Thread t:threads){
+            t.join();
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("time : "+(end - start)/1000 +"s");
+    }
 
 }

@@ -55,7 +55,7 @@ public class TaskManager {
         return new Thread() {
             @Override
             public void run() {
-                System.out.println("TaskManager starting!");
+                System.out.println("TaskManager starting...");
                 while (true) {
                     try {
                         Task poll = taskPool.poll();

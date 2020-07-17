@@ -6,6 +6,7 @@ import com.flex.shipment.factory.LoaderFactory;
 import com.flex.shipment.nio.ServerSelectorProtocol;
 
 import java.net.InetSocketAddress;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -28,6 +29,7 @@ public class ManagerBackend {
 
     private void init() {
         ExecutorService threadPool = taskManager.getThreadPool();
+        threadPool.submit(supplierManager.start());
         threadPool.submit(taskManager.start());
         threadPool.submit(scheduler.start());
         System.out.println("init finished!!!");
@@ -39,29 +41,32 @@ public class ManagerBackend {
             public void run() {
                 try {
                     init();
-                    Selector selector = Selector.open();
                     ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
                     serverSocketChannel.bind(new InetSocketAddress(10230));
                     serverSocketChannel.configureBlocking(false);
+                    Selector selector = Selector.open();
                     serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
                     ServerSelectorProtocol protocol = new ServerSelectorProtocol();
                     int i = 0;
                     while (true) {
                         SelectionKey key = null;
                         try {
-                            selector.select(1000);
+                            selector.select();
                             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+
                             while (iterator.hasNext()) {
                                 System.out.println("accept:"+ i++);
                                 key = iterator.next();
+                                SelectableChannel channel = key.channel();
+                                System.out.println("validOps:" + channel.validOps());
                                 iterator.remove();
                                 if (key.isAcceptable()) {
                                     System.out.println("isAcceptable!");
                                     protocol.handleAccept(key, "Hello Client,I get the message.", 1024);
                                 }
                                 if (key.isReadable()) {
-                                    System.out.println("handleRead!");
                                     Object o = protocol.handleRead(key);
+                                    System.out.println("scheduler receive a Object!");
                                     scheduler.receiver(o);
                                 }
                             }

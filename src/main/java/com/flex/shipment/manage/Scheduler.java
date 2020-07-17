@@ -18,33 +18,29 @@ public class Scheduler {
     private SupplierListener supplierListener;
     private SupplierManager supplierManager;
     private TaskManager taskManager;
+    private LinkedBlockingQueue<Object> objectsPool;
 
     public Scheduler(SupplierListener supplierListener,SupplierManager supplierManager, TaskManager taskManager){
         this.supplierListener = supplierListener;
         this.supplierManager = supplierManager;
         this.taskManager = taskManager;
+        this.objectsPool = supplierManager.getObjectsPool();
     }
 
     public void receiver(Object o){
-        if (o == null) return;
-        Trade t = (Trade)o;
-        Class<?> type = t.getType();
-        Trade trade = null;
-        if (Goods.class.equals(type)) {
-            trade = (Trade<Goods>) t;
+        try {
+            objectsPool.put(o);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        Supplier supplier = supplierManager.createSupplier(trade);
-        if (supplier != null) {
-            SupplierEvent event = new SupplierEvent(Status.START, supplier, trade);
-            supplierListener.register(event);
-        }
+
     }
 
     public Thread start(){
         return new Thread(){
             @Override
             public void run() {
-                System.out.println("Scheduler starting!!!");
+                System.out.println("Scheduler starting...");
                 LinkedBlockingQueue<SupplierEvent> suppliers = supplierListener.getSuppliers();
                 while (true) {
                     try {
