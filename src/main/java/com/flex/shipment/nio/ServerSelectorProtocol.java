@@ -19,9 +19,9 @@ public class ServerSelectorProtocol {
 
     public void handleAccept(SelectionKey key,String responseInfo,int bufSize)throws IOException{
         SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
-        socketChannel.write(ByteBuffer.wrap(responseInfo.getBytes("UTF-8")));
         socketChannel.configureBlocking(false);
         socketChannel.register(key.selector(),SelectionKey.OP_READ, ByteBuffer.allocate(bufSize));
+        socketChannel.write(ByteBuffer.wrap(responseInfo.getBytes("UTF-8")));
     }
 
     public Object handleRead(SelectionKey key)throws Exception{
@@ -31,12 +31,9 @@ public class ServerSelectorProtocol {
         int len;
         while ((len = channel.read(byteBuffer)) > 0) {
             byte[] bytes2 = byteBuffer.array();
-            System.out.println(len);
             bytes = ByteUtil.byteMergerByLength(bytes, bytes.length, bytes2, len);
-            System.out.println(bytes.length);
             byteBuffer.clear();
         }
-        System.out.println("handleRead bytes:"+bytes.length);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         Object o = objectInputStream.readObject();

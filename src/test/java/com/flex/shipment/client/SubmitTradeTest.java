@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description:
@@ -19,9 +20,23 @@ import java.util.concurrent.Future;
 public class SubmitTradeTest {
 
     public static void main(String[] args)throws Exception {
-        SubmitTrade submitTrade = new SubmitTrade();
-        Trade<Goods> trade = new Trade<Goods>("myTrade", 100, Goods.class);
-        submitTrade.submit(trade,"localhost",10230);
+        long start = System.currentTimeMillis();
+        int n = 0;
+        int num = 500;
+        ArrayList<Thread> threads = new ArrayList<>();
+        while (n<20) {
+            SendThread sendThread = new SendThread(n * num, num, 200);
+            Thread thread = new Thread(sendThread);
+            threads.add(thread);
+            thread.start();
+            thread.join();
+            System.out.println(n);
+            n++;
+        }
+        System.out.println("---------------------exec---------------------");
+
+        long end = System.currentTimeMillis();
+        System.out.println("time : "+(end - start)/1000 +"s");
     }
 
     @Test
@@ -70,18 +85,15 @@ public class SubmitTradeTest {
         long start = System.currentTimeMillis();
         int n = 0;
         int num = 100;
-        ArrayList<Thread> threads = new ArrayList<>();
         while (n<100) {
             SendThread sendThread = new SendThread(n * num, num, 200);
             Thread thread = new Thread(sendThread);
-            threads.add(thread);
             thread.start();
+            thread.join();
             n++;
         }
         System.out.println("---------------------exec---------------------");
-        for (Thread t:threads){
-            t.join();
-        }
+
         long end = System.currentTimeMillis();
         System.out.println("time : "+(end - start)/1000 +"s");
     }

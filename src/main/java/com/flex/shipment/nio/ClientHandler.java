@@ -16,8 +16,7 @@ public class ClientHandler {
         SocketChannel channel = (SocketChannel) key.channel();
         if (channel.isConnectionPending()){
             try {
-                boolean b = channel.finishConnect();
-                System.out.println("finishConnect:"+b);
+                channel.finishConnect();
             }catch (Exception e){
                 System.out.println("finishConnect error!");
             }
@@ -30,7 +29,6 @@ public class ClientHandler {
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(obj);
         byte[] bs = baos.toByteArray();
-        System.out.println(bs.length);
         ByteBuffer buffer = ByteBuffer.wrap(bs, 0, bs.length);
         socketChannel.write(buffer);
         baos.close();

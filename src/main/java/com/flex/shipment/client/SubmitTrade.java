@@ -32,11 +32,9 @@ public class SubmitTrade {
                     SelectionKey key = iterator.next();
                     iterator.remove();
                     if (key.isConnectable()) {
-                        System.out.println("handleConnect!");
                         handler.handleConnect(key, trade, 1024);
                     }
                     if (key.isReadable()) {
-                        System.out.println("isReadable!");
                         handler.handleRead(key);
                         key.channel().close();
                         flag = false;

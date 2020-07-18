@@ -53,18 +53,14 @@ public class ManagerBackend {
                         try {
                             selector.select();
                             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
-
                             while (iterator.hasNext()) {
                                 System.out.println("accept:"+ i++);
                                 key = iterator.next();
-                                SelectableChannel channel = key.channel();
-                                System.out.println("validOps:" + channel.validOps());
                                 iterator.remove();
-                                if (key.isAcceptable()) {
-                                    System.out.println("isAcceptable!");
+                                if (key.isValid() && key.isAcceptable()) {
                                     protocol.handleAccept(key, "Hello Client,I get the message.", 1024);
                                 }
-                                if (key.isReadable()) {
+                                if (key.isValid() && key.isReadable()) {
                                     Object o = protocol.handleRead(key);
                                     System.out.println("scheduler receive a Object!");
                                     scheduler.receiver(o);
